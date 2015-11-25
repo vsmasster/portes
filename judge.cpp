@@ -1,3 +1,23 @@
+#include "judge.hpp"
+
+pair<int,int> Judge::rollDice(){
+	int a = random() % 6 + 1;
+	int b = random() % 6 + 1;
+	roll_results.push_back(make_pair(a,b));
+	return make_pair(a,b);
+}
+
+bool Judge::isAlive(){
+	return ++turn_num < 10;
+}
+
+void Judge::log(){
+	cout<<"Player 1 throws: "<<roll_results[0].first<<" "<<roll_results[0].second<<endl;
+	cout<<"Player 2 throws: "<<roll_results[1].first<<" "<<roll_results[1].second<<endl;
+	roll_results.clear();
+}
+
+/*	
 	if(bar[color].size() == 0)return NO_CHEKCERS_IN_BAR;
 		if(fields[to].size() > 1 && fields[to][0].color != color)return MOVE_TO_WRONG_FIELD;
 		if(fields[to].size() == 1 && fields[to][0].color != color){
@@ -43,3 +63,4 @@
 	fields[to].push_back(*(--fields[from].end()));
 	fields[from].pop_back();
 	return CORRECT_MOVE;
+*/

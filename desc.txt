@@ -1,0 +1,21 @@
+main:
+- główna pętla programu,
+- powołuje do życia sędziego i graczy,
+- wywołuje ruchy
+
+jugde:
+- generuje rzut koscia dla gracza
+- przyjmuje ruch od gracza i sprawdza jego poprawnosc (zwraca true/false, ewentualnie bledy)
+- generuje logi zapytan
+- odpowiada na pytanie o ostatnie k ruchów
+- pilnuje, zeby nikt nie oszukiwal
+- decyduje o koncu gry
+
+player:
+- zwraca nazwę,
+- pyta sędziego o rzut kościa,
+- wykonuje ruch (po zapytaniu sedziego o poprawnosc)
+
+board:
+- klasa reprezentujaca plansze,
+- kazdy zawodnik trzyma swoja instancje i ja aktualizuje

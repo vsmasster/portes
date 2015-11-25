@@ -1,23 +1,18 @@
 #include <bits/stdc++.h>
 #include "board.hpp"
+#include "judge.hpp"
+#include "player.hpp"
 #include "constants.hpp"
 using namespace std;
 
 int main(){
-	Board board;
-	board.init();
-	
-	for(int i=0;i<BOARD_SIZE;i++){
-		cout<<"Field "<<i+1<<": ";
-		Field field = board.getField(i);
-		if(field.empty()){cout<<"empty"<<endl;continue;}
-		cout<<"color = "<<field.getColor()<<" ";
-		cout<<"content = {";
-		while(!field.empty()){
-			cout<<field.back().num<<",";
-			field.popBack();
-		}
-		cout<<"}"<<endl;
+	Judge* judge = new Judge();
+	Player pl1_handler(judge,false),pl2_handler(judge,false);
+	while(judge->isAlive()){
+		pl1_handler.turn();
+		pl2_handler.turn();
+		judge->log();
 	}
+	
 	return 0;
 }
