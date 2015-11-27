@@ -1,19 +1,32 @@
-#ifndef judge_h
-#define judge_h
+#ifndef judge_hpp
+#define judge_hpp
 #include <bits/stdc++.h>
+#include "constants.hpp"
+#include "checker.hpp"
 #include "board.hpp"
+#include "player.hpp"
+using namespace std;
+
+class Player;
+
 class Judge{
 	private:
 		Board board;
-		int turn_num;
-		vector< pair<int,int> > roll_results;
+		pair<int,int> dice;
+		vector< pair<int,int> > last_moves;
+		COLOR cur_player;
+		Player* pl1_handler, *pl2_handler;
+		vector< vector< pair<int,int> > >  generate_moves();
+		
+		
 	public:
-		Judge(){
-			turn_num = 0;
-			board.init();
-		}
+		Judge();
+		
+		void registerPlayers(Player* pl1, Player* pl2);
 		bool isAlive();
 		pair<int,int> rollDice();
+		bool move(int from,int to);
+		vector< pair<int,int> > getLastMoves();
 		void log();
 };
 

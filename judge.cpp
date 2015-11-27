@@ -1,66 +1,117 @@
 #include "judge.hpp"
 
+Judge::Judge(){
+	board.init();
+}
+
 pair<int,int> Judge::rollDice(){
 	int a = random() % 6 + 1;
 	int b = random() % 6 + 1;
-	roll_results.push_back(make_pair(a,b));
+	dice.first = a;
+	dice.second = b;
 	return make_pair(a,b);
 }
 
 bool Judge::isAlive(){
-	return ++turn_num < 10;
+	pl1_handler->turn();
+	return true;
+}
+
+void Judge::registerPlayers(Player* pl1,Player* pl2){
+	pl1_handler = pl1;
+	pl2_handler = pl2;
 }
 
 void Judge::log(){
-	cout<<"Player 1 throws: "<<roll_results[0].first<<" "<<roll_results[0].second<<endl;
-	cout<<"Player 2 throws: "<<roll_results[1].first<<" "<<roll_results[1].second<<endl;
-	roll_results.clear();
+
 }
 
-/*	
-	if(bar[color].size() == 0)return NO_CHEKCERS_IN_BAR;
-		if(fields[to].size() > 1 && fields[to][0].color != color)return MOVE_TO_WRONG_FIELD;
-		if(fields[to].size() == 1 && fields[to][0].color != color){
-			bar[!color].push_back(fields[to][0]);
-			fields[to].pop_back();
-			fields[to].push_back(*(--bar[color].end()));
-			bar[color].pop_back();
-			return CKECHER_KICKED;
+bool Judge::move(int from,int to){
+	auto moves = generate_moves();
+	for(auto move: moves){
+		if(move[0].first == from && move[0].second == to){
+			board.move(from,to,BLACK);
+			cout<< "Correct!" <<endl;
+			return true;
+		}
+	}
+	
+	cout<< "Oops! your move is not accepted!" <<endl;
+	return false;
+}
+
+vector< pair<int,int> > Judge::getLastMoves(){
+	return last_moves;
+}
+
+bool try_move(Board board,vector< pair<int,int> > moves){ 
+	for(auto move: moves){
+		if((move.first == BAR_FIELD && board.bar[BLACK].size() == 0) || (move.first != BAR_FIELD && board.bar[BLACK].size() != 0))
+			return false;
+			
+		if(move.first != BAR_FIELD && (board.getField(move.first).size() == 0 || board.getField(move.first).getColor() == WHITE))
+			return false;
+			
+		if(move.second < OFF_FIELD && (board.getField(move.second).size() > 1 && board.getField(move.second).getColor() == WHITE))
+			return false;
+			
+		if(move.second >= OFF_FIELD){
+			for(int i=0;i<18;i++)
+				if(board.getField(i).size() != 0 && board.getField(i).getColor() == BLACK)
+					return false;
+					
+			if(move.second > OFF_FIELD){
+				for(int i=18;i<move.first;i++)
+					if(board.getField(i).size() != 0 && board.getField(i).getColor() == BLACK)
+						return false;
+			}
 		}
 		
-		fields[to].push_back(*(--bar[color].end()));
-		bar[color].pop_back();
-		return CORRECT_MOVE;
+		board.move(move.first,move.second,BLACK);
 	}
 	
-	if(to == OFF_FIELD){ //move checker off the board
-		int beg = color == 0 ? WHITE_BASE_BEGIN : BLACK_BASE_BEGIN;
-		int end = color == 0 ? WHITE_BASE_END : BLACK_BASE_END;
-		
-		int sum = 0;
-		for(int i=beg;i<=end;i++)
-			if(fields[i].size() != 0 && fields[i][0].color == color)
-				sum += fields[i].size();
-				
-		if(sum + ch_off[color] != 15)return CHECKERS_NOT_IN_BASE;
-		
-		
-	}
-	
-	if(from != BAR_FIELD && bar[color].size() != 0)return CHECKERS_IN_BAR;
-	if(from > 24 || from < 0 || fields[from].size() == 0 || fields[from][0].color != color)return MOVE_FROM_WRONG_FIELD;
-	if(to > 24 || to < 0 || (fields[to].size() > 1 && fields[to][0].color != color))return MOVE_TO_WRONG_FIELD;
+	return true;
+}
 
-	
-	if(fields[to].size() == 1 && fields[to][0].color != color){
-		bar[!color].push_back(fields[to][0]);
-		fields[to].pop_back();
-		fields[to].push_back(*(--fields[from].end()));
-		fields[from].pop_back();
-		return CHECKER_KICKED;
+vector< vector< pair<int,int> > > Judge::generate_moves(){
+	vector< vector< pair<int,int> > > result;
+	if(dice.first != dice.second){
+		//first move with first dice
+		for(int i=BAR_FIELD;i<OFF_FIELD;i++)
+			for(int j=BAR_FIELD;j<OFF_FIELD;j++){
+				vector< pair<int,int> > temp;
+				temp.push_back(make_pair(i,i+dice.first));
+				temp.push_back(make_pair(j,j+dice.second));
+				if(try_move(board,temp))
+					result.push_back(temp);
+			}
+					
+		//first move with second dice
+		for(int i=BAR_FIELD;i<OFF_FIELD;i++)
+			for(int j=BAR_FIELD;j<OFF_FIELD;j++){
+				vector< pair<int,int> > temp;
+				temp.push_back(make_pair(i,i+dice.second));
+				temp.push_back(make_pair(j,j+dice.first));
+				if(try_move(board,temp))
+					result.push_back(temp);
+					
+			}
+	}else{
+		for(int i=BAR_FIELD;i<OFF_FIELD;i++)
+			for(int j=i;j<OFF_FIELD;j++)
+				for(int k=j;k<OFF_FIELD;k++)
+					for(int l=k;l<OFF_FIELD;l++){
+						vector< pair<int,int> > temp;
+						temp.push_back(make_pair(i,i+dice.first));
+						temp.push_back(make_pair(j,j+dice.first));
+						temp.push_back(make_pair(k,k+dice.first));
+						temp.push_back(make_pair(l,l+dice.first));
+						if(try_move(board,temp))
+							result.push_back(temp);
+							
+					}
+				
 	}
 	
-	fields[to].push_back(*(--fields[from].end()));
-	fields[from].pop_back();
-	return CORRECT_MOVE;
-*/
+	return result;
+}

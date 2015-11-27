@@ -1,5 +1,5 @@
-#ifndef checker_h
-#define checker_h
+#ifndef checker_hpp
+#define checker_hpp
 
 enum COLOR{
 	WHITE = 0,

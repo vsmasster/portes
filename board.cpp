@@ -21,6 +21,10 @@ Checker Field::back(){
 	return checkers.back();
 }
 
+int Field::size(){
+	return checkers.size();
+}
+
 void Board::init(){
 	fields[0].pushBack({0,BLACK});
 	fields[0].pushBack({1,BLACK});
@@ -54,11 +58,6 @@ void Board::init(){
 	fields[23].pushBack({14,WHITE});
 }
 
-void Board::kickChecker(int field_id,COLOR color){
-	bar[color].push_back(fields[field_id].back());
-	fields[field_id].popBack();
-}
-
 void Board::move(int from, int to, COLOR color){
 	Checker checker;
 	if(from == BAR_FIELD){
@@ -71,7 +70,13 @@ void Board::move(int from, int to, COLOR color){
 		
 	if(to == OFF_FIELD)
 		ch_off[color]++;
-	else fields[to].pushBack(checker);
+	else{
+		if(fields[to].size() == 1 && fields[to].color != color){ //kicking checker
+			bar[!color].push_back(fields[to].back());
+			fields[to].popBack();
+		}
+		fields[to].pushBack(checker);
+	}
 }
 
 bool Board::checkerInBar(COLOR color){
@@ -84,6 +89,39 @@ COLOR Board::getFieldColor(int field_id){
 
 Field Board::getField(int field_id){
 	return fields[field_id];
+}
+
+void Board::print(){
+	cout<<"BOARD:"<<endl;
+	int mx_up = 0;
+	for(int i=12;i<24;i++)mx_up = max(mx_up,fields[i].size());
+	for(int i=0;i<mx_up;i++){
+		for(int j=12;j<24;j++){
+			if(j == 18 && bar[0].size() > i)cout<<"|W|";
+			else if(j == 18)cout<<"| |";
+			if(fields[j].size() > i)
+				cout<< (fields[j].getColor() == BLACK ? "B" : "W");
+			else cout<< (i == 0 ? "." : " ");
+		}
+		cout<<endl;
+	}
+	
+	for(int i=0;i<6;i++)cout<<" ";
+	cout<<"| |";
+	for(int i=0;i<6;i++)cout<<" ";
+	cout<<endl;
+	int mx_down = 0;
+	for(int i=11;i>=0;i--)mx_down = max(mx_down,fields[i].size());
+	for(int i=mx_down-1;i>=0;i--){
+		for(int j=11;j>=0;j--){
+			if(j == 5 && bar[1].size() > i)cout<<"|B|";
+			else if(j == 5)cout<<"| |";
+			if(fields[j].size() > i)
+				cout<< (fields[j].getColor() == BLACK ? "B" : "W");
+			else cout<< (i == 0 ? "." : " ");
+		}
+		cout<<endl;
+	}
 }
 
 

@@ -1,8 +1,8 @@
 #ifndef board_h
 #define board_h
 #include <bits/stdc++.h>
-#include "checker.hpp"
 #include "constants.hpp"
+#include "checker.hpp"
 using namespace std;
 
 class Board;
@@ -17,6 +17,7 @@ private:
 public:
 	void pushBack(Checker checker);
 	void popBack();
+	int size();
 	bool empty();
 	COLOR getColor();
 	Checker back();
@@ -25,20 +26,19 @@ public:
 class Board{
 private:
 	Field fields[24];
-	vector<Checker> bar[2];
-	int ch_off[2];
 	
 public:
 	void init();
+	vector<Checker> bar[2];
+	int ch_off[2];
 	void move(int from,int to,COLOR color);
-	void kickChecker(int field_id,COLOR color);
+	void print();
 	
 	COLOR getFieldColor(int field_id);
 	Field getField(int field_id);
 	
 	bool checkerInBar(COLOR color);
 	bool isFieldEmpty(int field_id);
-	
 };
 
 #endif

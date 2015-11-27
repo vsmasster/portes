@@ -1,18 +1,20 @@
 #include <bits/stdc++.h>
-#include "board.hpp"
+#include "checker.hpp"
 #include "judge.hpp"
 #include "player.hpp"
-#include "constants.hpp"
 using namespace std;
 
 int main(){
-	Judge* judge = new Judge();
-	Player pl1_handler(judge,false),pl2_handler(judge,false);
-	while(judge->isAlive()){
-		pl1_handler.turn();
-		pl2_handler.turn();
-		judge->log();
-	}
+	Judge *judge = new Judge;
+	Player *pl1_handler = new Player(judge,false,BLACK);
+	Player *pl2_handler = new Player(judge,true,WHITE);
+	judge->registerPlayers(pl1_handler,pl2_handler);
+	cout<< "Please tell us what are your names?" <<endl;
+	string name1 = pl1_handler->getName();
+	string name2 = pl2_handler->getName();
+	cout<< "So, "<< name1 << " plays against " << name2 << endl;
+	cout<< "Good luck and don't cheat!" <<endl;
+	while(judge->isAlive());
 	
 	return 0;
 }
