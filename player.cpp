@@ -21,8 +21,8 @@ void Player::turn(){
 	board.print();
 	int from,to;
 	cin>>from>>to;
-	while(!judge->move(from,to))
+	while(!judge->move(from,to,WHITE))
 		cin>>from>>to;
 		
-	board.move(from,to,BLACK);
+	board.move(from,to,WHITE);
 }

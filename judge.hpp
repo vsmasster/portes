@@ -17,6 +17,7 @@ class Judge{
 		COLOR cur_player;
 		Player* pl1_handler, *pl2_handler;
 		vector< vector< pair<int,int> > >  generate_moves();
+		bool ifEnd();
 		
 		
 	public:
@@ -25,7 +26,7 @@ class Judge{
 		void registerPlayers(Player* pl1, Player* pl2);
 		bool isAlive();
 		pair<int,int> rollDice();
-		bool move(int from,int to);
+		bool move(int from,int to,COLOR color);
 		vector< pair<int,int> > getLastMoves();
 		void log();
 };
