@@ -1,10 +1,16 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <cstdlib>
+#include <cmath>
+#include <ctime>
 #include "checker.hpp"
 #include "judge.hpp"
 #include "player.hpp"
 using namespace std;
 
 int main(){
+	srand(time(0));
 	Judge *judge = new Judge;
 	Player *pl1_handler = new Player(judge,true,BLACK);
 	Player *pl2_handler = new Player(judge,false,WHITE);

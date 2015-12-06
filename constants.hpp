@@ -17,7 +17,7 @@
  * BOARD CONSTANTS
  */
 #define BAR_FIELD -1
-#define OFF_FIELD 25
+#define OFF_FIELD 24
 #define BLACK_BASE_BEGIN 18
 #define BLACK_BASE_END 23
 #define WHITE_BASE_BEGIN 0

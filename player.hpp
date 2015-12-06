@@ -1,6 +1,9 @@
 #ifndef player_hpp
 #define player_hpp
-#include <bits/stdc++.h>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
 #include "constants.hpp"
 #include "checker.hpp"
 #include "board.hpp"
@@ -18,11 +21,12 @@ class Player{
 		Judge* judge;
 		string name;
 		Board board;
+		COLOR color;
 	
 	public:
 		Player(Judge* _judge,bool _ai,COLOR color);
-		std::string getName();
-		void turn();
+		string getName();
+		void turn(Board board);
 };
 
 #endif

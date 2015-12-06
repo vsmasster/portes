@@ -1,12 +1,13 @@
 #include "board.hpp"
 
-void Field::pushBack(Checker checker){
-	checkers.push_back(checker);
-	color = checker.color;
+void Field::add(COLOR c, int num = 1){
+	checkers += num;
+	color = c;
 }
 
-void Field::popBack(){
-	checkers.pop_back();
+void Field::remove(){
+	checkers--;
+	if (checkers == 0)color = NO_COLOR;
 }
 
 COLOR Field::getColor(){
@@ -14,73 +15,66 @@ COLOR Field::getColor(){
 }
 
 bool Field::empty(){
-	return checkers.empty();
-}
-
-Checker Field::back(){
-	return checkers.back();
+	return checkers == 0;
 }
 
 int Field::size(){
-	return checkers.size();
+	return checkers;
+}
+
+bool operator==(Field& f1,Field& f2){
+	if (f1.size() != f2.size())return false;
+	if (f1.size() == 0 && f2.size() == 0)return true;
+	return f1.color == f2.color;
 }
 
 void Board::init(){
-	fields[0].pushBack({0,BLACK});
-	fields[0].pushBack({1,BLACK});
-	fields[11].pushBack({2,BLACK});
-	fields[11].pushBack({3,BLACK});
-	fields[11].pushBack({4,BLACK});
-	fields[11].pushBack({5,BLACK});
-	fields[11].pushBack({6,BLACK});
-	fields[16].pushBack({7,BLACK});
-	fields[16].pushBack({8,BLACK});
-	fields[16].pushBack({9,BLACK});
-	fields[18].pushBack({10,BLACK});
-	fields[18].pushBack({11,BLACK});
-	fields[18].pushBack({12,BLACK});
-	fields[18].pushBack({13,BLACK});
-	fields[18].pushBack({14,BLACK});
-	fields[5].pushBack({0,WHITE});
-	fields[5].pushBack({1,WHITE});
-	fields[5].pushBack({2,WHITE});
-	fields[5].pushBack({3,WHITE});
-	fields[5].pushBack({4,WHITE});
-	fields[7].pushBack({5,WHITE});
-	fields[7].pushBack({6,WHITE});
-	fields[7].pushBack({7,WHITE});
-	fields[12].pushBack({8,WHITE});
-	fields[12].pushBack({9,WHITE});
-	fields[12].pushBack({10,WHITE});
-	fields[12].pushBack({11,WHITE});
-	fields[12].pushBack({12,WHITE});
-	fields[23].pushBack({13,WHITE});
-	fields[23].pushBack({14,WHITE});
+	for (int i = 0; i < 24; i++)fields[i].add(NO_COLOR, 0);
+	fields[0].add(BLACK,2);
+	fields[11].add(BLACK,5);
+	fields[16].add(BLACK,3);
+	fields[18].add(BLACK,5);
+	fields[5].add(WHITE,5);
+	fields[7].add(WHITE,3);
+	fields[12].add(WHITE,5);
+	fields[23].add(WHITE,2);
+
+	ch_off[0] = 0;
+	ch_off[1] = 0;
+	bar[0] = 0;
+	bar[1] = 0;
+}
+
+bool operator==(Board& b1,Board& b2){
+	for (int i = 0; i < 24; i++)
+		if (!(b1.getField(i) == b2.getField(i)))return false;
+
+	if (b1.bar[WHITE] != b2.bar[WHITE])return false;
+	if (b1.bar[BLACK] != b2.bar[BLACK])return false;
+
+	return true;
 }
 
 void Board::move(int from, int to, COLOR color){
-	Checker checker;
 	if(from == BAR_FIELD){
-		checker = bar[color].back();
-		bar[color].pop_back();
+		bar[color]--;
 	}else{
-		checker = fields[from].back();
-		fields[from].popBack();
+		fields[from].remove();
 	}
 		
 	if(to == OFF_FIELD)
 		ch_off[color]++;
 	else{
 		if(fields[to].size() == 1 && fields[to].color != color){ //kicking checker
-			bar[!color].push_back(fields[to].back());
-			fields[to].popBack();
+			bar[!color]++;
+			fields[to].remove();
 		}
-		fields[to].pushBack(checker);
+		fields[to].add(color);
 	}
 }
 
 bool Board::checkerInBar(COLOR color){
-	return !bar[color].empty();
+	return bar[color];
 }
 
 COLOR Board::getFieldColor(int field_id){
@@ -93,11 +87,17 @@ Field Board::getField(int field_id){
 
 void Board::print(){
 	cout<<"BOARD:"<<endl;
+	for (int i = 12; i <= 17; i++)
+		cout << i % 10;
+	cout << "   ";
+	for (int i = 18; i < 24; i++)
+		cout << i % 10;
+	cout << endl;
 	int mx_up = 0;
 	for(int i=12;i<24;i++)mx_up = max(mx_up,fields[i].size());
 	for(int i=0;i<mx_up;i++){
 		for(int j=12;j<24;j++){
-			if(j == 18 && bar[0].size() > i)cout<<"|W|";
+			if(j == 18 && bar[0] > i)cout<<"|W|";
 			else if(j == 18)cout<<"| |";
 			if(fields[j].size() > i)
 				cout<< (fields[j].getColor() == BLACK ? "B" : "W");
@@ -114,7 +114,7 @@ void Board::print(){
 	for(int i=11;i>=0;i--)mx_down = max(mx_down,fields[i].size());
 	for(int i=mx_down-1;i>=0;i--){
 		for(int j=11;j>=0;j--){
-			if(j == 5 && bar[1].size() > i)cout<<"|B|";
+			if(j == 5 && bar[1] > i)cout<<"|B|";
 			else if(j == 5)cout<<"| |";
 			if(fields[j].size() > i)
 				cout<< (fields[j].getColor() == BLACK ? "B" : "W");
@@ -122,6 +122,26 @@ void Board::print(){
 		}
 		cout<<endl;
 	}
+
+	for (int i = 11; i >= 6; i--)
+		cout << i % 10;
+
+	cout << "   ";
+	for (int i = 5; i >= 0; i--)
+		cout << i % 10;
+	cout << endl;
+}
+
+int Board::getBarSize(COLOR color){
+	return bar[color];
+}
+
+int Board::getNumOff(COLOR color){
+	return ch_off[color];
+}
+
+bool Board::isTerminalState(){
+	return ch_off[0] == 15 || ch_off[1] == 15;
 }
 
 
